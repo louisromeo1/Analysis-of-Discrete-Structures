@@ -1,0 +1,4 @@
+Author: Louis Romeo
+Date: 4/26/2024
+Description: Given a working implementation of a right-leaning red-black tree that is already augmented so that each node keeps track of its own height. This enables us to retrieve the height of a node in O(logN) time simply by finding the node instead of calculating the height. This project requires us to augment it further so that each node also knows the size of the subtree for which it is the root (size meaning the number of nodes in that subtree). This has to be done within the insert function so that all those values are updated within the insert function as the insert function executes (not as a separate traversal). The second task is to implement some additional methods for the tree that use the augmented information in the nodes. You must use the Node class as is. It counts the number of times you access nodes.
+Grade: 100/100

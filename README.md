@@ -1,5 +1,5 @@
 # CSC 345
 Author: Louis Romeo
-- Projects focusing on Analysis of Discrete Structures.
-- Showcases knowledge of arrays, linked-lists, red-black trees, priority queues and sorting algorithms and more.
-- Contains a group Huffman Encoding project written from scratch.
+- Analysis of Discrete Structures at the University of Arizona, Spring 2023.
+- Contains 5 Java projects and a group project focusing on Huffman Encoding.
+- Oriented around known data structures and algorithms including arrays, linked-lists, red-black trees, priority queues and sorting algorithms and more.

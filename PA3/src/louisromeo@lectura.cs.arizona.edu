@@ -1,0 +1,467 @@
+/*
+ * Louis Romeo
+ * CSC 345 PA3
+ * Purpose: Implementation of different sorting algorithms 
+ * 			using a given Array and LinkedList object. Includes
+ * 			mergeSort, insertionSort, selectionSort and bubbleSort.
+ */
+public class Sort {
+
+    // Sort Array A using an iterative Merge Sort algorithm
+    public static void iterativeMerge(Array A) {
+        
+    	int[] temp = new int[A.length()];
+    	
+    	for (int size = 1; size < A.length(); size *= 2) {
+            
+    		for (int leftStart = 0; leftStart < A.length() - 1; leftStart += 2 * size) {
+                
+            	int mid = Math.min(leftStart + size - 1, A.length() - 1);
+                int rightEnd = Math.min(leftStart + 2 * size - 1, A.length() - 1);
+                merge(A, temp, leftStart, mid, rightEnd);
+            }
+        }
+    }
+
+    // Helper merge function for merging two sorted sub-arrays
+    private static void merge(Array A, int[] temp, int leftStart, int mid, int rightEnd) {
+        
+    	int left = leftStart;
+        int right = mid + 1;
+        int index = leftStart;
+
+        while (left <= mid && right <= rightEnd) {
+            
+        	if (A.getVal(left) <= A.getVal(right)) {
+                temp[index++] = A.getVal(left++);
+            } else {
+                temp[index++] = A.getVal(right++);
+            }
+        }
+
+        while (left <= mid) {
+            temp[index++] = A.getVal(left++);
+        }
+
+        while (right <= rightEnd) {
+            temp[index++] = A.getVal(right++);
+        }
+
+        for (int i = leftStart; i <= rightEnd; i++) {
+            
+        	A.setVal(i, temp[i]);
+        }
+    }
+
+    // Sorting Array A using a combination of Insertion Sort and Merge Sort
+    public static void insertMerge(Array A, int size) {
+        
+    	for (int i = 0; i < A.length(); i += size) {
+            
+    		int left = i;
+            int right = Math.min(i + size - 1, A.length() - 1);
+            insertionSort(A, left, right);
+        }
+
+        int[] temp = new int[A.length()];
+        
+        // Iterative approach
+        for (int currSize = size; currSize < A.length(); currSize *= 2) {
+            
+        	for (int leftStart = 0; leftStart < A.length() - 1; leftStart += 2 * currSize) {
+                
+            	int mid = Math.min(leftStart + currSize - 1, A.length() - 1);
+                int rightEnd = Math.min(leftStart + 2 * currSize - 1, A.length() - 1);
+                merge(A, temp, leftStart, mid, rightEnd);
+            }
+        }
+    }
+
+    // Helper method for insertion sort
+    private static void insertionSort(Array A, int left, int right) {
+        
+    	for (int i = left + 1; i <= right; i++) {
+            
+    		int key = A.getVal(i);
+            int j = i - 1;
+            
+            while (j >= left && A.getVal(j) > key) {
+                
+            	A.setVal(j + 1, A.getVal(j));
+                j--;
+            }
+            A.setVal(j + 1, key);
+        }
+    }
+    
+    // Sort Array A using a recursive 3-way Merge Sort algorithm
+    public static void threeWayMerge(Array A) {
+        
+    	if (A.length() > 1) {
+            int mid1 = A.length() / 3;
+            int mid2 = 2 * A.length() / 3;
+
+            Array leftPart = new Array(mid1);
+            Array midPart = new Array(mid2 - mid1);
+            Array rightPart = new Array(A.length() - mid2);
+
+            for (int i = 0; i < mid1; i++) {
+                
+            	leftPart.setVal(i, A.getVal(i));
+            }
+            for (int i = mid1; i < mid2; i++) {
+                
+            	midPart.setVal(i - mid1, A.getVal(i));
+            }
+            for (int i = mid2; i < A.length(); i++) {
+                
+            	rightPart.setVal(i - mid2, A.getVal(i));
+            }
+
+            threeWayMerge(leftPart);
+            threeWayMerge(midPart);
+            threeWayMerge(rightPart);
+
+            mergeThree(A, leftPart, midPart, rightPart);
+        }
+    }
+
+    // Merge function for 3-way merge sort
+    private static void mergeThree(Array A, Array leftPart, Array midPart, Array rightPart) {
+        
+    	int i = 0;
+    	int j = 0;
+    	int k = 0;
+        
+    	while (i < leftPart.length() && j < midPart.length() && k < rightPart.length()) {
+            
+        	if (leftPart.getVal(i) <= midPart.getVal(j) && 
+            		leftPart.getVal(i) <= rightPart.getVal(k)) {
+                A.setVal(i + j + k, leftPart.getVal(i++));
+            } else if (midPart.getVal(j) <= leftPart.getVal(i) && 
+            		midPart.getVal(j) <= rightPart.getVal(k)) {
+                A.setVal(i + j + k, midPart.getVal(j++));
+            } else {
+                A.setVal(i + j + k, rightPart.getVal(k++));
+            }
+        }
+        while (i < leftPart.length()) {
+            
+        	A.setVal(i + j + k, leftPart.getVal(i++));
+        }
+        while (j < midPart.length()) {
+            
+        	A.setVal(i + j + k, midPart.getVal(j++));
+        }
+        while (k < rightPart.length()) {
+            
+        	A.setVal(i + j + k, rightPart.getVal(k++));
+        }
+    }
+
+    // Sort Array A using a five-way Quicksort
+    // (done recursively within helper function)
+    public static void fiveWayQuick(Array A) {
+        fiveWayQuickSort(A, 0, A.length() - 1);
+    }
+
+    // Helper method for recursion on fiveWayQuick
+    private static void fiveWayQuickSort(Array A, int low, int high) {
+        if (low < high) {
+            int[] pivots = partition(A, low, high);
+
+            fiveWayQuickSort(A, low, pivots[0] - 1);
+            fiveWayQuickSort(A, pivots[0] + 1, pivots[1] - 1);
+            fiveWayQuickSort(A, pivots[1] + 1, high);
+        }
+    }
+    
+    // Helper method to partition the array with two indexes.
+    private static int[] partition(Array A, int low, int high) {
+        
+    	int pivot1 = A.getVal(low);
+        int pivot2 = A.getVal(high);
+
+        if (pivot1 > pivot2) {
+            A.swap(low, high); // swap places
+            pivot1 = A.getVal(low);
+            pivot2 = A.getVal(high);
+        }
+
+        int i = low + 1;
+        int lt = low + 1;
+        int gt = high - 1;
+
+        while (i <= gt) {
+            
+        	if (A.getVal(i) < pivot1) {
+                A.swap(i, lt);
+                i++;
+                lt++;
+            } else if (A.getVal(i) >= pivot1 && A.getVal(i) <= pivot2) {
+                i++;
+            } else {
+                A.swap(i, gt);
+                gt--;
+            }
+        }
+
+        A.swap(low, --lt);
+        A.swap(high, ++gt);
+
+        return new int[]{lt, gt};
+    }
+    
+    // Sort Array A using a locality-aware version of Selection Sort
+    public static void locSelect(Array A, int d) {
+        
+    	int n = A.length();
+        
+    	for (int i = 0; i < n; i++) {
+            
+    		int minIndex = i;
+            
+    		for (int j = i + 1; j < Math.min(i + d + 1, n); j++) {
+                
+    			if (A.getVal(j) < A.getVal(minIndex)) {
+                    minIndex = j;
+                }
+            }
+            A.swap(i, minIndex);
+        }
+    }
+
+    // Sorts Array A using a locality aware version of Heapsort
+    public static void locHeap(Array A, int d) {
+        
+    	int n = A.length();
+
+        // create a heap
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            heapify(A, n, i, d);
+        }
+
+        // One by one extract an element from heap
+        for (int i = n - 1; i >= 0; i--) {     
+            A.swap(0, i); // Move current root to end
+            heapify(A, i, 0, d); // call max heapify on the reduced heap
+        }
+    }
+
+    // To heapify a subtree rooted with a node i which is
+    // an index in the Array, n is size of heap
+    private static void heapify(Array A, int n, int i, int d) {
+        
+    	int largest = i; // Initialize largest as root
+        int left = 5 * i + 1; // left = 5*i + 1
+        int right = 5 * i + 5; // right = 5*i + 5
+
+        // Find largest root, left child and right child
+        for (int j = left; j < Math.min(left + d + 1, right); j++) {
+            
+        	if (j < n && A.getVal(j) > A.getVal(largest)) {
+                largest = j;
+            }
+        }
+
+        // Recursively heapify the affected sub-tree
+        if (largest != i) {
+            A.swap(i, largest);
+            heapify(A, n, largest, d);
+        }
+    }
+    
+    // Sort the list using a recursive version of Merge Sort
+    public static LinkedList mergeSort(LinkedList list) {
+    	
+    	// empty list or single element list is already sorted
+        if (list == null || list.isEmpty() || list.head() == null 
+        		|| list.head().next() == null) {
+            return list; // Base case
+        }
+
+        // Split the list into two halves
+        LinkedList[] halves = split(list);
+
+        // Recursively sort each half
+        LinkedList left = mergeSort(halves[0]);
+        LinkedList right = mergeSort(halves[1]);
+
+        // Merge the sorted halves
+        return merge(left, right);
+    }
+
+    // Helper method to split the list into two halves
+    private static LinkedList[] split(LinkedList list) {
+        
+    	LinkedList slow = list;
+        LinkedList fast = list;
+        LinkedList prev = null;
+
+        while (fast != null && fast.head() != null && 
+        		fast.head().next() != null) {
+            
+        	prev = slow;
+            slow = slow.tail();
+            fast = fast.tail().tail();
+        }
+
+        if (prev != null) {
+            prev.head().setNext(null);
+        }
+
+        return new LinkedList[] { list, slow };
+    }
+
+    // Helper method to merge two sorted lists
+    private static LinkedList merge(LinkedList left, LinkedList right) {
+        
+    	LinkedList merged = new LinkedList();
+        Node leftPtr = left.head();
+        Node rightPtr = right.head();
+
+        while (leftPtr != null && rightPtr != null) {
+            
+        	if (leftPtr.val() <= rightPtr.val()) {
+                merged.add(leftPtr.val());
+                leftPtr = leftPtr.next();
+            } else {
+                merged.add(rightPtr.val());
+                rightPtr = rightPtr.next();
+            }
+        }
+
+        while (leftPtr != null) {
+            
+        	merged.add(leftPtr.val());
+            leftPtr = leftPtr.next();
+        }
+
+        while (rightPtr != null) {
+            
+        	merged.add(rightPtr.val());
+            rightPtr = rightPtr.next();
+        }
+
+        return merged;
+    }
+    // Sort the list using a recursive version of 2-way Quicksort
+    public static LinkedList quickSort(LinkedList list) {
+        
+    	// empty list or single element list is already sorted
+    	if (list == null || list.isEmpty() || list.head().next() == null) {
+            return list; // Base case
+        }
+
+        // Chooses a pivot (head of list)
+        Node pivot = list.head();
+
+        // Partition the list around the pivot
+        LinkedList[] partitions = partition(list, pivot);
+
+        // Recursively sort the partitions
+        LinkedList lessThanPivot = quickSort(partitions[0]);
+        LinkedList greaterThanPivot = quickSort(partitions[1]);
+
+        // Concatenate the sorted partitions with the pivot in between
+        lessThanPivot.add(pivot.val());
+        lessThanPivot.head().setNext(greaterThanPivot.head());
+
+        return lessThanPivot;
+    }
+
+    // Helper method to partition the list around a pivot
+    private static LinkedList[] partition(LinkedList list, Node pivot) {
+        
+    	LinkedList lessThanPivot = new LinkedList();
+        LinkedList greaterThanPivot = new LinkedList();
+        Node current = list.head().next(); // Skip over the pivot node
+
+        while (current != null) {
+            
+        	if (current.val() <= pivot.val()) {
+                lessThanPivot.add(current.val());
+            } else {
+                greaterThanPivot.add(current.val());
+            }
+            current = current.next();
+        }
+
+        return new LinkedList[] { lessThanPivot, greaterThanPivot };
+    }
+    
+    // Sort the list using a recursive version of Insertion Sort
+    public static LinkedList insertionSort(LinkedList list) {
+        
+    	if (list == null || list.isEmpty() || list.head().next() == null) {
+            return list; // Base case
+        }
+
+        Node sorted = null;
+        Node current = list.head();
+
+        while (current != null) {
+            
+        	Node next = current.next();
+            sorted = insert(sorted, current);
+            current = next;
+        }
+
+        list = new LinkedList(sorted);
+        return list;
+    }
+
+    // Helper function utilized to insert a new node into
+    // the LinkedList
+    private static Node insert(Node sorted, Node newNode) {
+        
+    	if (sorted == null || sorted.val() >= newNode.val()) {
+            newNode.setNext(sorted);
+            return newNode;
+        }
+
+        sorted.setNext(insert(sorted.next(), newNode));
+        return sorted;
+    }
+
+    // Sort the list using a recursive version of Bubble Sort
+    public static LinkedList bubbleSort(LinkedList list) {
+        
+    	if (list == null || list.isEmpty() || list.head().next() == null) {
+            return list;
+        }
+
+        boolean swapped = false; // flag
+        Node prev = null;
+        Node current = list.head();
+        Node nextNode = current.next();
+
+        while (nextNode != null) {
+            
+        	if (current.val() > nextNode.val()) {
+                swap(prev, current, nextNode);
+                swapped = true;
+            }
+            prev = current;
+            current = current.next();
+            nextNode = nextNode.next();
+        }
+
+        if (swapped) {
+            return bubbleSort(list);
+        } else {
+            return list;
+        }
+    }
+
+    // Helper method used to swap Nodes in LinkedList
+    private static void swap(Node prev, Node node1, Node node2) {   
+    	
+    	if (prev != null) {
+            prev.setNext(node2);
+        } else {
+            node1.setNext(node2.next());
+        }
+        node2.setNext(node1);
+    }
+}
